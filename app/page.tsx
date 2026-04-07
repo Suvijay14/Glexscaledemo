@@ -26,6 +26,7 @@ import {
 } from "react";
 import { CountUp } from "@/components/CountUp";
 import { GlexScaleLogo } from "@/components/GlexScaleLogo";
+import CookieBanner from "@/components/CookieBanner";
 import {
   FONTS,
   GLEX_FONT_CHANGE_EVENT,
@@ -139,6 +140,7 @@ export default function HomePage() {
   const [demoBarDismissed, setDemoBarDismissed] = useState(false);
   const [activeFont, setActiveFont] = useState("syne");
   const [previewFont, setPreviewFont] = useState<string | null>(null);
+  const [lang, setLang] = useState<"en" | "fr">("en");
 
   const theme = useMemo(
     () => (isDark ? DARK_TOKENS : LIGHT_TOKENS),
@@ -158,6 +160,55 @@ export default function HomePage() {
     const saved = localStorage.getItem("glexTheme");
     if (saved === "light") setIsDark(false);
   }, []);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("glexLang");
+    if (saved === "fr") setLang("fr");
+    const onLang = (e: Event) => {
+      const d = (e as CustomEvent<{ lang: "en" | "fr" }>).detail;
+      if (d?.lang) setLang(d.lang);
+    };
+    window.addEventListener("glexLangChange", onLang as EventListener);
+    return () => window.removeEventListener("glexLangChange", onLang as EventListener);
+  }, []);
+
+  const T = {
+    en: {
+      eyebrow: "Channel Partner Intelligence · EMEA",
+      headline1: "Find the Right Partners.",
+      headline2: "Get Found by the Right Vendors.",
+      subheadline:
+        "PartnerMatch by GlexScale scores every vendor-partner match across 5 dimensions — so you stop guessing and start closing.",
+      vendorCTA: "Find Channel Partners →",
+      partnerCTA: "Register as a Partner →",
+      demoBtn: "Explore the Demo →",
+      demoSub: "No login required · All features visible · Simulated data",
+      legalPrivacy: "Privacy Policy",
+      legalTerms: "Terms of Service",
+      legalMentions: "Mentions Legales",
+      footerTagline: "Global Growth Accelerator · Paris, France",
+      floatingBar: "👋 See PartnerMatch in action — explore all 5 platform features",
+      launchDemo: "Launch Demo →",
+    },
+    fr: {
+      eyebrow: "Intelligence des Partenaires · EMEA",
+      headline1: "Trouvez les Bons Partenaires.",
+      headline2: "Faites-vous Decouvrir par les Bons Editeurs.",
+      subheadline:
+        "PartnerMatch by GlexScale evalue chaque partenariat sur 5 dimensions — pour arreter de deviner et commencer a conclure.",
+      vendorCTA: "Trouver des Partenaires →",
+      partnerCTA: "S'inscrire comme Partenaire →",
+      demoBtn: "Explorer la Demo →",
+      demoSub: "Sans connexion · Toutes les fonctionnalites · Donnees simulees",
+      legalPrivacy: "Politique de Confidentialite",
+      legalTerms: "Conditions Generales",
+      legalMentions: "Mentions Legales",
+      footerTagline: "Accelerateur de Croissance Mondial · Paris, France",
+      floatingBar: "👋 Decouvrez PartnerMatch — explorez les 5 fonctionnalites de la plateforme",
+      launchDemo: "Lancer la Demo →",
+    },
+  } as const;
+  const tt = T[lang];
 
   useEffect(() => {
     const saved = localStorage.getItem(GLEX_FONT_STORAGE_KEY);
@@ -290,7 +341,7 @@ export default function HomePage() {
             className="text-xs font-medium uppercase tracking-widest"
             style={{ color: eyebrowColor }}
           >
-            Channel Partner Intelligence · EMEA
+            {tt.eyebrow}
           </motion.p>
 
           <div className="mt-4 space-y-1">
@@ -301,7 +352,7 @@ export default function HomePage() {
               className="text-[40px] font-bold leading-tight tracking-tight md:text-[64px]"
               style={{ color: t.textPrimary, transition: heroTransition, ...heroHeading }}
             >
-              Find the Right Partners.
+              {tt.headline1}
             </motion.h1>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -310,7 +361,7 @@ export default function HomePage() {
               className="text-[40px] font-bold leading-tight tracking-tight md:text-[64px]"
               style={{ color: headlineLine2Color, transition: heroTransition, ...heroHeading }}
             >
-              Get Found by the Right Vendors.
+              {tt.headline2}
             </motion.h1>
           </div>
 
@@ -321,8 +372,7 @@ export default function HomePage() {
             className="mx-auto mt-6 max-w-3xl font-dm text-[18px] leading-relaxed"
             style={{ color: t.textSecondary, transition }}
           >
-            PartnerMatch by GlexScale scores every vendor-partner match across 5
-            dimensions — so you stop guessing and start closing.
+            {tt.subheadline}
           </motion.p>
 
           {/* Two CTA cards */}
@@ -383,18 +433,11 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <Link
-                  href="/login?role=vendor"
+                  href="/demo"
                   className="mt-6 flex w-full items-center justify-center rounded-lg py-3 text-sm font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:brightness-110"
                   style={{ backgroundColor: "#570284" }}
                 >
-                  Find Channel Partners →
-                </Link>
-                <Link
-                  href="/login"
-                  className="mt-3 text-center font-dm text-xs transition hover:underline"
-                  style={{ color: t.textMuted }}
-                >
-                  Already have an account? Log in →
+                  {tt.vendorCTA}
                 </Link>
               </motion.div>
 
@@ -500,7 +543,7 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <Link
-                  href="/login?role=partner"
+                  href="/demo"
                   className="mt-6 flex w-full items-center justify-center rounded-lg py-3 text-sm font-semibold shadow-md transition hover:-translate-y-0.5 hover:shadow-[0_0_24px_rgba(125,216,85,0.35)]"
                   style={
                     isDark
@@ -508,14 +551,7 @@ export default function HomePage() {
                       : { backgroundColor: "#4A9E2E", color: "#FFFFFF" }
                   }
                 >
-                  Register as a Partner →
-                </Link>
-                <Link
-                  href="/login"
-                  className="mt-3 text-center font-dm text-xs transition hover:underline"
-                  style={{ color: t.textMuted }}
-                >
-                  Already registered? Log in →
+                  {tt.partnerCTA}
                 </Link>
               </motion.div>
             </div>
@@ -540,13 +576,13 @@ export default function HomePage() {
                 transition,
               }}
             >
-              Explore the Demo →
+              {tt.demoBtn}
             </Link>
             <p
               className="mt-2 text-center font-dm text-xs"
               style={{ color: t.textMuted, transition }}
             >
-              No login required · All features visible · Simulated data
+              {tt.demoSub}
             </p>
           </motion.div>
         </div>
@@ -929,14 +965,14 @@ export default function HomePage() {
                 className="min-w-0 text-sm sm:text-base"
                 style={{ color: t.textPrimary, transition }}
               >
-                👋 See PartnerMatch in action — explore all 5 platform features
+                {tt.floatingBar}
               </p>
               <div className="flex shrink-0 items-center gap-2">
                 <Link
                   href="/demo"
                   className="rounded-full bg-[#7DD855] px-4 py-2 text-sm font-semibold text-[#0A0A0F] transition hover:bg-[#9EE876]"
                 >
-                  Launch Demo →
+                  {tt.launchDemo}
                 </Link>
                 <button
                   type="button"
@@ -965,21 +1001,19 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-10 md:flex-row md:items-start">
           <div>
             <GlexScaleLogo compact />
-            <p className="mt-4 text-sm text-text-muted">
-              Global Growth Accelerator
-            </p>
+            <p className="mt-4 text-sm text-text-muted">{tt.footerTagline}</p>
           </div>
-          <nav className="flex flex-wrap justify-center gap-8 text-sm text-text-secondary">
-            <Link href="/demo" className="hover:text-white">
-              Try Demo
-            </Link>
-            <Link href="/login" className="hover:text-white">
-              Log in
-            </Link>
-            <Link href="/login" className="hover:text-white">
-              Partner access
-            </Link>
-          </nav>
+          <div className="flex gap-6 flex-wrap justify-center">
+            <a href="/mentions-legales" style={{ color: "#6B5F82", fontSize: "12px" }}>
+              {tt.legalMentions}
+            </a>
+            <a href="#" style={{ color: "#6B5F82", fontSize: "12px" }}>
+              {tt.legalPrivacy}
+            </a>
+            <a href="#" style={{ color: "#6B5F82", fontSize: "12px" }}>
+              {tt.legalTerms}
+            </a>
+          </div>
           <div className="flex gap-4 text-text-secondary">
             <a href="#" aria-label="Social" className="hover:text-green-accent">
               <Share2 className="h-5 w-5" />
@@ -993,7 +1027,11 @@ export default function HomePage() {
             </a>
           </div>
         </div>
+        <p style={{ color: "#6B5F82", fontSize: "12px", marginTop: "8px", textAlign: "center" }}>
+          © 2026 GlexScale · {tt.footerTagline}
+        </p>
       </footer>
+      <CookieBanner lang={lang} />
     </motion.div>
   );
 }

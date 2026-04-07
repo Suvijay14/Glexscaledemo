@@ -31,7 +31,19 @@ type NavItem = {
   match: (ctx: { pathname: string; hash: string }) => boolean;
 };
 
-function buildNavItems(basePath: "/demo" | "/app"): {
+function buildNavItems(
+  basePath: "/demo" | "/app",
+  st: {
+    overview: string;
+    directory: string;
+    profile: string;
+    gcs: string;
+    dashboard: string;
+    analytics: string;
+    adminPanel: string;
+    userMgmt: string;
+  }
+): {
   platform: NavItem[];
   vendor: NavItem[];
   admin: NavItem[];
@@ -48,26 +60,26 @@ function buildNavItems(basePath: "/demo" | "/app"): {
     platform: [
       {
         href: basePath,
-        label: "Overview",
+        label: st.overview,
         icon: LayoutDashboard,
         match: ({ pathname }) => pathname === basePath,
       },
       {
         href: dir,
-        label: "Partner Directory",
+        label: st.directory,
         icon: Search,
         match: ({ pathname }) => pathname === dir,
       },
       {
         href: profile,
-        label: "Partner Profile",
+        label: st.profile,
         icon: User,
         match: ({ pathname, hash }) =>
           dirRe.test(pathname) && hash !== "gcs",
       },
       {
         href: gcs,
-        label: "GCS Score Engine",
+        label: st.gcs,
         icon: BarChart3,
         match: ({ pathname, hash }) =>
           dirRe.test(pathname) && hash === "gcs",
@@ -76,14 +88,14 @@ function buildNavItems(basePath: "/demo" | "/app"): {
     vendor: [
       {
         href: dash,
-        label: "Vendor Dashboard",
+        label: st.dashboard,
         icon: Target,
         match: ({ pathname, hash }) =>
           pathname === dash && hash !== "analytics",
       },
       {
         href: `${dash}#analytics`,
-        label: "Match Analytics",
+        label: st.analytics,
         icon: TrendingUp,
         match: ({ pathname, hash }) =>
           pathname === dash && hash === "analytics",
@@ -92,14 +104,14 @@ function buildNavItems(basePath: "/demo" | "/app"): {
     admin: [
       {
         href: adm,
-        label: "Admin Panel",
+        label: st.adminPanel,
         icon: Settings,
         match: ({ pathname, hash }) =>
           pathname === adm && hash !== "users",
       },
       {
         href: `${adm}#users`,
-        label: "User Management",
+        label: st.userMgmt,
         icon: Users,
         match: ({ pathname, hash }) =>
           pathname === adm && hash === "users",
@@ -192,10 +204,74 @@ export function DemoSidebar({
   const { t, isDashDark, toggleDashTheme } = useDashTheme();
   const pathname = usePathname() ?? "";
   const [hash, setHash] = useState("");
+  const [lang, setLang] = useState<"en" | "fr">("en");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("glexLang");
+    if (saved === "fr") setLang("fr");
+  }, []);
+
+  const toggleLang = () => {
+    const next = lang === "en" ? "fr" : "en";
+    setLang(next);
+    localStorage.setItem("glexLang", next);
+  };
+
+  const SIDEBAR_T = {
+    en: {
+      platform: "PLATFORM",
+      overview: "Overview",
+      directory: "Partner Directory",
+      profile: "Partner Profile",
+      gcs: "GCS Score Engine",
+      vendor: "VENDOR",
+      dashboard: "Vendor Dashboard",
+      analytics: "Match Analytics",
+      admin: "ADMINISTRATION",
+      adminPanel: "Admin Panel",
+      userMgmt: "User Management",
+      aboutDemo: "ABOUT THIS DEMO",
+      featureSpec: "Feature Specification",
+      roadmap: "Phase Roadmap",
+      exitDemo: "← Back to Home",
+      loginAccess: "Contact GlexScale →",
+      version: "v1.0 · Demo Build · Phase 1 of 3",
+      demoBadge: "DEMO MODE — Data is simulated",
+      lightMode: "Light Mode",
+      darkMode: "Dark Mode",
+      switchFr: "Passer en Français",
+      switchEn: "Switch to English",
+    },
+    fr: {
+      platform: "PLATEFORME",
+      overview: "Vue d'ensemble",
+      directory: "Annuaire des Partenaires",
+      profile: "Profil Partenaire",
+      gcs: "Moteur de Score GCS",
+      vendor: "ÉDITEUR",
+      dashboard: "Tableau de Bord Éditeur",
+      analytics: "Analyses de Matching",
+      admin: "ADMINISTRATION",
+      adminPanel: "Panneau Admin",
+      userMgmt: "Gestion des Utilisateurs",
+      aboutDemo: "À PROPOS DE LA DÉMO",
+      featureSpec: "Spécification des Fonctionnalités",
+      roadmap: "Feuille de Route",
+      exitDemo: "← Retour à l'accueil",
+      loginAccess: "Contacter GlexScale →",
+      version: "v1.0 · Démo · Phase 1 sur 3",
+      demoBadge: "MODE DÉMO — Données simulées",
+      lightMode: "Mode Clair",
+      darkMode: "Mode Sombre",
+      switchFr: "Passer en Français",
+      switchEn: "Switch to English",
+    },
+  } as const;
+  const st = SIDEBAR_T[lang];
 
   const { platform, vendor, admin } = useMemo(
-    () => buildNavItems(basePath),
-    [basePath]
+    () => buildNavItems(basePath, st),
+    [basePath, st]
   );
 
   const layoutGroupId = basePath.replace("/", "");
@@ -220,7 +296,7 @@ export function DemoSidebar({
 
   const navBlock = (
     <LayoutGroup id={`sidebar-nav-${layoutGroupId}`}>
-      <SectionLabel>Platform</SectionLabel>
+      <SectionLabel>{st.platform}</SectionLabel>
       <div className="space-y-0.5">
         {platform.map((item) => (
           <NavRow
@@ -233,7 +309,7 @@ export function DemoSidebar({
         ))}
       </div>
 
-      <SectionLabel>Vendor</SectionLabel>
+      <SectionLabel>{st.vendor}</SectionLabel>
       <div className="space-y-0.5">
         {vendor.map((item) => (
           <NavRow
@@ -246,7 +322,7 @@ export function DemoSidebar({
         ))}
       </div>
 
-      <SectionLabel>Administration</SectionLabel>
+      <SectionLabel>{st.admin}</SectionLabel>
       <div className="space-y-0.5">
         {admin.map((item) => (
           <NavRow
@@ -259,7 +335,7 @@ export function DemoSidebar({
         ))}
       </div>
 
-      <SectionLabel>About this demo</SectionLabel>
+      <SectionLabel>{st.aboutDemo}</SectionLabel>
       <div className="space-y-0.5">
         <button
           type="button"
@@ -279,7 +355,7 @@ export function DemoSidebar({
           }}
         >
           <FileText className="h-4 w-4" style={{ color: t.dashTextMuted }} />
-          Feature Specification
+          {st.featureSpec}
         </button>
         <button
           type="button"
@@ -299,7 +375,7 @@ export function DemoSidebar({
           }}
         >
           <Map className="h-4 w-4" style={{ color: t.dashTextMuted }} />
-          Phase Roadmap
+          {st.roadmap}
         </button>
       </div>
     </LayoutGroup>
@@ -331,7 +407,7 @@ export function DemoSidebar({
               borderBottom: `1px solid ${t.dashSidebarBorder}`,
             }}
           >
-            DEMO MODE — Data is simulated
+            {st.demoBadge}
           </div>
         )}
 
@@ -383,6 +459,22 @@ export function DemoSidebar({
           style={{ borderTop: `1px solid ${t.dashSidebarBorder}` }}
         >
           <div
+            className="mx-2 mb-2 flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 transition-all duration-[350ms]"
+            onClick={toggleLang}
+            style={{
+              backgroundColor: isDashDark ? "#1A1625" : "#F9F7F4",
+              border: `1px solid ${isDashDark ? "#1E1A2E" : "#E0D8CC"}`,
+            }}
+          >
+            <span className="text-sm">{lang === "en" ? "🇫🇷" : "🇬🇧"}</span>
+            <span
+              className="text-xs font-medium"
+              style={{ color: isDashDark ? "#A89BC2" : "#666666" }}
+            >
+              {lang === "en" ? st.switchFr : st.switchEn}
+            </span>
+          </div>
+          <div
             className="mx-2 mb-2 flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 transition-all duration-[350ms]"
             onClick={toggleDashTheme}
             onKeyDown={(e) => {
@@ -410,7 +502,7 @@ export function DemoSidebar({
                   color: isDashDark ? "#A89BC2" : "#666666",
                 }}
               >
-                {isDashDark ? "Light Mode" : "Dark Mode"}
+                {isDashDark ? st.lightMode : st.darkMode}
               </span>
             </div>
             <div
@@ -443,7 +535,7 @@ export function DemoSidebar({
                 PartnerMatch
               </p>
               <p className="text-xs" style={{ color: t.dashVersionText }}>
-                v1.0 · Demo Build · Phase 1 of 3
+                {st.version}
               </p>
             </div>
           </div>
@@ -464,16 +556,16 @@ export function DemoSidebar({
                   color: t.dashTextSecondary,
                 }}
               >
-                Exit Demo
+                {st.exitDemo}
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/login"
+                href="/"
                 onClick={onCloseMobile}
                 className="block text-center text-sm font-semibold transition-colors"
                 style={{ color: t.dashGreen }}
               >
-                Log in for full access →
+                {st.loginAccess}
               </Link>
             </div>
           )}

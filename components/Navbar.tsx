@@ -53,6 +53,8 @@ export interface NavbarProps {
   setFontDropdownOpen?: (open: boolean) => void;
   previewFont?: string | null;
   setPreviewFont?: (id: string | null) => void;
+  lang?: "en" | "fr";
+  toggleLang?: () => void;
 }
 
 function LightHomeLogo() {
@@ -125,6 +127,8 @@ export function Navbar(props: NavbarProps = {}) {
     fontDropdownOpen: fontDropdownOpenProp,
     setFontDropdownOpen: setFontDropdownOpenProp,
     setPreviewFont: setPreviewFontProp,
+    lang: langProp,
+    toggleLang: toggleLangProp,
   } = props;
 
   const pathname = usePathname();
@@ -159,6 +163,7 @@ export function Navbar(props: NavbarProps = {}) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const [internalLang, setInternalLang] = useState<"en" | "fr">("en");
 
   useEffect(() => {
     if (fontControlled) return;
@@ -179,6 +184,12 @@ export function Navbar(props: NavbarProps = {}) {
     const saved = localStorage.getItem("glexTheme");
     if (saved === "light") setIsDark(false);
   }, []);
+
+  useEffect(() => {
+    if (langProp) return;
+    const saved = localStorage.getItem("glexLang");
+    if (saved === "fr") setInternalLang("fr");
+  }, [langProp]);
 
   useEffect(() => {
     if (!fontDropdownOpen) return;
@@ -225,26 +236,25 @@ export function Navbar(props: NavbarProps = {}) {
     setPreviewFontProp?.(null);
   };
 
+  const lang = langProp ?? internalLang;
+  const toggleLang = () => {
+    if (toggleLangProp) {
+      toggleLangProp();
+      return;
+    }
+    const next = lang === "en" ? "fr" : "en";
+    setInternalLang(next);
+    localStorage.setItem("glexLang", next);
+    window.dispatchEvent(new CustomEvent("glexLangChange", { detail: { lang: next } }));
+  };
+
   const rightActions = (
     <div className="flex items-center gap-3">
-      <Link
-        href="/login"
-        className="text-sm font-medium transition"
-        style={{ color: navTheme.link }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.color = navTheme.linkHover;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.color = navTheme.link;
-        }}
-      >
-        Log in
-      </Link>
       <Link
         href="/demo"
         className="rounded-full bg-[#7DD855] px-5 py-2.5 text-sm font-semibold text-[#0A0A0F] transition hover:bg-[#9EE876]"
       >
-        Try Demo →
+        {lang === "en" ? "Try Demo →" : "Essayer la Démo →"}
       </Link>
     </div>
   );
@@ -478,6 +488,21 @@ export function Navbar(props: NavbarProps = {}) {
     </div>
   ) : null;
 
+  const langToggle = isHome ? (
+    <button
+      type="button"
+      onClick={toggleLang}
+      className="flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-bold transition-all"
+      style={{
+        borderColor: isDark ? "#1E1A2E" : "#D0C8B8",
+        backgroundColor: isDark ? "#1A1625" : "#FFFFFF",
+        color: isDark ? "#A89BC2" : "#666666",
+      }}
+    >
+      {lang === "en" ? "🇫🇷 FR" : "🇬🇧 EN"}
+    </button>
+  ) : null;
+
   return (
     <header
       className={cn(
@@ -505,6 +530,7 @@ export function Navbar(props: NavbarProps = {}) {
         <div className="flex items-center gap-2 md:gap-3">
           {fontSwitcher}
           {themeToggle}
+          {langToggle}
           <div className="hidden md:block">{rightActions}</div>
 
           <button
@@ -533,25 +559,11 @@ export function Navbar(props: NavbarProps = {}) {
         >
           <div className="flex flex-col gap-3">
             <Link
-              href="/login"
-              className="rounded-lg px-3 py-2 text-center text-sm font-medium transition"
-              style={{ color: navTheme.link }}
-              onClick={() => setOpen(false)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = navTheme.linkHover;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = navTheme.link;
-              }}
-            >
-              Log in
-            </Link>
-            <Link
               href="/demo"
               className="rounded-full bg-[#7DD855] py-2.5 text-center text-sm font-semibold text-[#0A0A0F]"
               onClick={() => setOpen(false)}
             >
-              Try Demo →
+              {lang === "en" ? "Try Demo →" : "Essayer la Démo →"}
             </Link>
           </div>
         </div>
