@@ -211,12 +211,6 @@ export function DemoSidebar({
     if (saved === "fr") setLang("fr");
   }, []);
 
-  const toggleLang = () => {
-    const next = lang === "en" ? "fr" : "en";
-    setLang(next);
-    localStorage.setItem("glexLang", next);
-  };
-
   const SIDEBAR_T = {
     en: {
       platform: "PLATFORM",
@@ -458,22 +452,6 @@ export function DemoSidebar({
           className="mt-auto p-4"
           style={{ borderTop: `1px solid ${t.dashSidebarBorder}` }}
         >
-          <div
-            className="mx-2 mb-2 flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 transition-all duration-[350ms]"
-            onClick={toggleLang}
-            style={{
-              backgroundColor: isDashDark ? "#1A1625" : "#F9F7F4",
-              border: `1px solid ${isDashDark ? "#1E1A2E" : "#E0D8CC"}`,
-            }}
-          >
-            <span className="text-sm">{lang === "en" ? "🇫🇷" : "🇬🇧"}</span>
-            <span
-              className="text-xs font-medium"
-              style={{ color: isDashDark ? "#A89BC2" : "#666666" }}
-            >
-              {lang === "en" ? st.switchFr : st.switchEn}
-            </span>
-          </div>
           <div
             className="mx-2 mb-2 flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 transition-all duration-[350ms]"
             onClick={toggleDashTheme}
