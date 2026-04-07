@@ -128,7 +128,6 @@ export function Navbar(props: NavbarProps = {}) {
     setFontDropdownOpen: setFontDropdownOpenProp,
     setPreviewFont: setPreviewFontProp,
     lang: langProp,
-    toggleLang: toggleLangProp,
   } = props;
 
   const pathname = usePathname();
@@ -237,17 +236,6 @@ export function Navbar(props: NavbarProps = {}) {
   };
 
   const lang = langProp ?? internalLang;
-  const toggleLang = () => {
-    if (toggleLangProp) {
-      toggleLangProp();
-      return;
-    }
-    const next = lang === "en" ? "fr" : "en";
-    setInternalLang(next);
-    localStorage.setItem("glexLang", next);
-    window.dispatchEvent(new CustomEvent("glexLangChange", { detail: { lang: next } }));
-  };
-
   const rightActions = (
     <div className="flex items-center gap-3">
       <Link
@@ -488,21 +476,6 @@ export function Navbar(props: NavbarProps = {}) {
     </div>
   ) : null;
 
-  const langToggle = isHome ? (
-    <button
-      type="button"
-      onClick={toggleLang}
-      className="flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-bold transition-all"
-      style={{
-        borderColor: isDark ? "#1E1A2E" : "#D0C8B8",
-        backgroundColor: isDark ? "#1A1625" : "#FFFFFF",
-        color: isDark ? "#A89BC2" : "#666666",
-      }}
-    >
-      {lang === "en" ? "🇫🇷 FR" : "🇬🇧 EN"}
-    </button>
-  ) : null;
-
   return (
     <header
       className={cn(
@@ -530,7 +503,6 @@ export function Navbar(props: NavbarProps = {}) {
         <div className="flex items-center gap-2 md:gap-3">
           {fontSwitcher}
           {themeToggle}
-          {langToggle}
           <div className="hidden md:block">{rightActions}</div>
 
           <button
