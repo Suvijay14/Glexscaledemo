@@ -60,7 +60,9 @@ export const LIGHT_DASH_TOKENS = {
   dashVersionText: "#AAAAAA",
 } as const;
 
-export type DashTokens = typeof DARK_DASH_TOKENS;
+export type DashTokens = {
+  [K in keyof typeof DARK_DASH_TOKENS]: string;
+};
 
 /** GCS dimension / circular track — theme-specific empty track only; fills stay semantic. */
 export const DASH_GCS_TRACK = {

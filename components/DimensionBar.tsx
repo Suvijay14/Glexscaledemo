@@ -14,6 +14,7 @@ export function DimensionBar({
   label: string;
   score: number;
   friction?: boolean;
+  tiny?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
